@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using Generator;
 
 namespace Juego
 {
+	enum acciones { comprobar, marcar, mostrar, invalida }
+	enum estados { jugando, procesando, perdio, gano }
+
     class Program
     {
-        enum acciones { comprobar, marcar, mostrar, invalida }
-        enum estados { jugando, procesando, perdio, gano }
-
-        static void Main(string[] args)
+        static void Main()
         {
             Table buscaMinas;
             int alto, ancho, bombas;
             estados estado = estados.jugando;
 
             Console.Title = "BuscaMinas";
-            
+
             obtenerDatos(out alto, out ancho, out bombas);
 
             buscaMinas = new Table(alto, ancho, bombas);
@@ -27,6 +27,7 @@ namespace Juego
 
             Console.Title = "BuscaMinas - Cant. Bombas: " + bombas;
 
+            Coordinate co;
             while (estado == estados.jugando)
             {
                 do
@@ -34,11 +35,15 @@ namespace Juego
                     switch (elegirAccion())
                     {
                         case acciones.mostrar:
-                            buscaMinas.showSquare(leerCoordenadas(alto, ancho));
+                            co = leerCoordenadas(alto, ancho);
+                            mostrarCuadro(alto, ancho, ref buscaMinas, ref co);
+                            if (buscaMinas.isBomb(co))
+                                estado = estados.perdio;
                             break;
 
                         case acciones.marcar:
-                            buscaMinas.changeFlag(leerCoordenadas(alto, ancho));
+                            co = leerCoordenadas(alto, ancho);
+                            buscaMinas.changeFlag(co);
                             break;
 
                         case acciones.comprobar:
@@ -51,7 +56,7 @@ namespace Juego
                         default:
                             estado = estados.procesando;
                             break;
-                    };
+                    }
                 } while (estado == estados.procesando);
                 Console.Clear();
                 dibujarTabla(alto, ancho, buscaMinas);
@@ -67,21 +72,26 @@ namespace Juego
         private static void obtenerDatos (out int alto, out int ancho, out int bombas)
         {
             Console.Write("Por favor ingrese el alto de la tabla: ");
-            while (!int.TryParse(Console.ReadLine(), out alto))
+            while (!getValue(out alto))
                 Console.Write("Numero ingresado no es valido, intentelo otra vez: ");
 
             Console.Write("Por favor ingrese el ancho de la tabla: ");
-            while (!int.TryParse(Console.ReadLine(), out ancho))
+            while (!getValue(out ancho))
                 Console.Write("Numero ingresado no es valido, intentelo otra vez: ");
 
             Console.Write("Por favor la cantidad de bombas: ");
-            while (!int.TryParse(Console.ReadLine(), out bombas) || bombas > alto * ancho)
+            while (!getValue(out bombas) || bombas > alto * ancho)
             {
                 if (bombas > alto * ancho)
                     Console.Write("La cantidad de bombas excede el limite posible, intentelo otra vez: ");
                 else
                     Console.Write("Numero ingresado no es valido, intentelo otra vez: ");
             }
+        }
+
+        private static bool getValue (out int value) 
+        {
+            return int.TryParse(Console.ReadLine(), out value);
         }
         private static void dibujarTabla (int alto, int ancho, Table tabla)
         {
@@ -137,7 +147,7 @@ namespace Juego
         private static acciones elegirAccion ()
         {
             Console.WriteLine("1 - Mostrar casilla \n2 - (Des)marcar casilla \n3 - Comprobar marcas");
-            char[] letra = Console.ReadLine().ToCharArray();
+            string letra = Console.ReadLine();
             switch(letra[0])
             {
                 case '1':                    
@@ -148,9 +158,22 @@ namespace Juego
                     return acciones.comprobar;
                 default:
                     return acciones.invalida;
-            };
+            }
 
         }
-        
+        private static void mostrarCuadro (int alto, int ancho, ref Table BM, ref Coordinate co)
+        {
+            if (BM.isVisible(co)) return;
+            BM.showSquare(co);
+            if (!BM.isZero(co)) return;
+
+            int[] around = { -1, 0, 1 };
+            foreach(int x in around) foreach(int y in around)
+            {
+                Coordinate temp = new Coordinate(co.first + x, co.second + y);
+                if (temp != new Coordinate(0,0) && 0 <= temp.first && temp.first < alto && 0 <= temp.second && temp.second < ancho)
+                        mostrarCuadro(alto, ancho, ref BM, ref temp);
+            }
+        }
     }
 }
