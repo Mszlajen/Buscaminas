@@ -1,5 +1,4 @@
 ﻿using System;
-//using System.Collections.Generic;
 using Generator;
 
 namespace Juego
@@ -37,7 +36,7 @@ namespace Juego
                         case acciones.mostrar:
                             co = leerCoordenadas(alto, ancho);
                             mostrarCuadro(alto, ancho, ref buscaMinas, ref co);
-                            if (buscaMinas.isBomb(co))
+                            if (!buscaMinas.isFlagged(co) && buscaMinas.isBomb(co))
                                 estado = estados.perdio;
                             break;
 
@@ -163,7 +162,7 @@ namespace Juego
         }
         private static void mostrarCuadro (int alto, int ancho, ref Table BM, ref Coordinate co)
         {
-            if (BM.isVisible(co)) return;
+            if (BM.isVisible(co) || BM.isFlagged(co)) return;
             BM.showSquare(co);
             if (!BM.isZero(co)) return;
 

@@ -32,6 +32,8 @@ namespace Generator
         public bool isZero() { return bombs == 0; }
 
         public bool isVisible() { return visible; }
+
+        public bool isFlagged() { return flag; }
     } // Fin Class Square
 
     class Coordinate 
@@ -55,6 +57,7 @@ namespace Generator
         {
             return !(co1 == co2);
         }
+
     }
     class Table
     {
@@ -163,6 +166,11 @@ namespace Generator
         public bool isVisible (Coordinate co)
         {
             return table[co.first, co.second].isVisible();
+        }
+
+        public bool isFlagged (Coordinate co)
+        {
+            return table[co.first, co.second].isFlagged();
         }
         public void showAll () 
         {
