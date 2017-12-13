@@ -166,11 +166,11 @@ namespace Juego
             BM.showSquare(co);
             if (!BM.isZero(co)) return;
 
-            int[] around = { -1, 0, 1 };
-            foreach(int x in around) foreach(int y in around)
+            Coordinate[] around = { new Coordinate(-1, 0), new Coordinate (1, 0), new Coordinate(0, -1), new Coordinate(0, 1) };
+            foreach(Coordinate sum in around)
             {
-                Coordinate temp = new Coordinate(co.first + x, co.second + y);
-                if (temp != new Coordinate(0,0) && 0 <= temp.first && temp.first < alto && 0 <= temp.second && temp.second < ancho)
+                Coordinate temp = co + sum;
+                if (0 <= temp.first && temp.first < alto && 0 <= temp.second && temp.second < ancho)
                         mostrarCuadro(alto, ancho, ref BM, ref temp);
             }
         }

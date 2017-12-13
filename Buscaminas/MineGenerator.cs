@@ -58,6 +58,11 @@ namespace Generator
             return !(co1 == co2);
         }
 
+        public static Coordinate operator + (Coordinate co1, Coordinate co2)
+        {
+            return new Coordinate(co1.first + co2.first, co1.second + co2.second);
+        }
+
     }
     class Table
     {
